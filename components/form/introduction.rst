@@ -153,6 +153,22 @@ the CSRF generator and validated when binding the form.
         $csrfStorage = new NativeSessionTokenStorage();
         // ...
 
+    For standalone Form component integration use the following::
+    
+        use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
+        use Symfony\Component\Security\Csrf\CsrfTokenManager;
+        use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+    
+        $csrfGenerator = new UriSafeTokenGenerator();
+        $csrfStorage = new NativeSessionTokenStorage();
+        $csrfManager = new CsrfTokenManager($csrfGenerator, $csrfStorage);
+        
+        // ...
+        
+        //Integrate into formFactory:
+        $formFactory = Forms::createFormFactoryBuilder()
+              ->addExtension(new CsrfExtension($csrfManager))
+
 Twig Templating
 ~~~~~~~~~~~~~~~
 
@@ -204,7 +220,7 @@ to bootstrap or access Twig and add the :class:`Symfony\\Bridge\\Twig\\Extension
     $formEngine->setEnvironment($twig);
     // add the FormExtension to Twig
     $twig->addExtension(
-        new FormExtension(new TwigRenderer($formEngine, $csrfProvider))
+        new FormExtension(new TwigRenderer($formEngine, $csrfManager))
     );
 
     // create your form factory as normal
